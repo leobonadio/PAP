@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Teste T1 - Compressão de texto com Bit Packing
+Teste T2 - Compressão de texto com Gzip
 Projeto: Epistemotécnica do Processamento
 Autor: Leonardo Bonadio
-Versão: T1_v1
+Versão: T2_v1
 """
 
+import gzip
 import time
 import math
 import psutil
 import os
 from collections import Counter
-from typing import Tuple, Optional, Any
+from typing import Optional, Any
 from datetime import datetime
 
 # Importa configurações do ficheiro config.py
@@ -22,10 +23,10 @@ from config import MODO, CONFIG_BD
 # CONFIGURAÇÃO DO TESTE
 # ===============================
 FICHEIRO = "texto_teste_1.txt"
-ALGORITMO = "bit_packing"
-VERSAO_SCRIPT = "T1_v1"
+ALGORITMO = "gzip"
+VERSAO_SCRIPT = "T2_v1"
 ORIGEM = "local"
-COMENTARIO_PREVIO = "Teste de compressão estrutural com bit packing"
+COMENTARIO_PREVIO = "Teste de compressão com Gzip (sem perda)"
 
 # ===============================
 # IMPORTAÇÕES CONDICIONAIS
@@ -83,41 +84,6 @@ def calcular_redundancia(entropia_atual: float, entropia_maxima: float) -> float
     if entropia_maxima == 0:
         return 0.0
     return max(0.0, 1.0 - (entropia_atual / entropia_maxima))
-
-
-def bit_packing_texto(texto: str) -> Tuple[bytes, dict]:
-    """
-    Comprime texto usando bit packing:
-    - Mapeia cada caracter único para um código binário mínimo
-    - Agrupa os bits e converte para bytes
-    
-    Retorna:
-        - dados comprimidos (bytes)
-        - metadados (dict) contendo a tabela de codificação e informações de padding
-    """
-    if not texto:
-        return bytes(), {"tabela": {}, "bits_por_char": 0, "padding": 0}
-    
-    caracteres = sorted(set(texto))
-    n_chars = len(caracteres)
-    bits_por_char = max(1, math.ceil(math.log2(n_chars)))
-    
-    tabela = {c: format(i, f"0{bits_por_char}b") for i, c in enumerate(caracteres)}
-    bits = "".join(tabela[c] for c in texto)
-    
-    padding = (8 - len(bits) % 8) % 8
-    bits += "0" * padding
-    
-    dados_comprimidos = bytes(int(bits[i:i+8], 2) for i in range(0, len(bits), 8))
-    
-    metadados = {
-        "tabela": tabela,
-        "bits_por_char": bits_por_char,
-        "padding": padding,
-        "n_caracteres_unicos": n_chars
-    }
-    
-    return dados_comprimidos, metadados
 
 
 def medir_recursos_sistema() -> dict:
@@ -310,18 +276,18 @@ def mostrar_resultados_terminal(resultados: dict):
 
 def executar_teste():
     """
-    Executa o teste T1 completo e retorna todas as métricas.
+    Executa o teste T2 completo e retorna todas as métricas.
     """
     
     print(f"\n{'='*70}")
-    print(f"Teste T1 - Bit Packing")
+    print(f"Teste T2 - Gzip")
     print(f"Modo: {MODO.upper()} | Início: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*70}\n")
     
     # Leitura do ficheiro
     try:
-        with open(FICHEIRO, "r", encoding="utf-8") as f:
-            texto = f.read()
+        with open(FICHEIRO, "rb") as f:
+            dados_originais = f.read()
     except FileNotFoundError:
         print(f"ERRO: Ficheiro '{FICHEIRO}' não encontrado.\n")
         return None
@@ -329,20 +295,19 @@ def executar_teste():
         print(f"ERRO ao ler ficheiro: {e}\n")
         return None
     
-    if not texto:
+    if not dados_originais:
         print("AVISO: Ficheiro vazio.\n")
         return None
     
-    dados_originais = texto.encode("utf-8")
     tamanho_original = len(dados_originais)
     
-    print(f"Ficheiro lido: {len(texto)} caracteres ({tamanho_original} bytes)")
+    print(f"Ficheiro lido: {tamanho_original} bytes")
     
     # Medição e compressão
     recursos_inicio = medir_recursos_sistema()
     tempo_inicio = time.perf_counter()
     
-    dados_comprimidos, metadados = bit_packing_texto(texto)
+    dados_comprimidos = gzip.compress(dados_originais)
     
     tempo_fim = time.perf_counter()
     recursos_fim = medir_recursos_sistema()
@@ -391,12 +356,8 @@ def executar_teste():
         "cpu_utilizado": cpu_utilizado,
         "memoria_utilizada": memoria_utilizada,
         
-        "bits_por_caracter": metadados["bits_por_char"],
-        "padding_bits": metadados["padding"],
-        "caracteres_unicos": metadados["n_caracteres_unicos"],
-        
         "perdas_detectadas": False,
-        "nivel_ruido": variacao_entropia_relativa
+        "nivel_ruido": abs(variacao_entropia)
     }
     
     return resultados
