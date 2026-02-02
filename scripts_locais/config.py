@@ -10,5 +10,5 @@ CONFIG_BD = {
     "port": 5432,
     "database": "epistemotecnica",
     "user": "leonardo",
-    "password": "senha_segura"  # ATENÇÃO: Nunca commits passwords em Git!
+    "password": "senha_segur"  # ATENÇÃO: Nunca commits passwords em Git!
 }
