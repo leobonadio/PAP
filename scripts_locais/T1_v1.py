@@ -14,8 +14,6 @@ import os
 from collections import Counter
 from typing import Tuple, Optional, Any
 from datetime import datetime
-
-# Importa configurações do ficheiro config.py
 from config import MODO, CONFIG_BD
 
 # ===============================
@@ -23,7 +21,7 @@ from config import MODO, CONFIG_BD
 # ===============================
 FICHEIRO = "texto_teste_1.txt"
 ALGORITMO = "bit_packing"
-VERSAO_SCRIPT = "T1_v1"
+VERSAO_SCRIPT = "v1"
 ORIGEM = "local"
 COMENTARIO_PREVIO = "Teste de compressão estrutural com bit packing"
 
@@ -162,7 +160,7 @@ def conectar_bd() -> Optional[Any]:
 
 def inserir_teste_bd(conn: Any, resultados: dict) -> Optional[int]:
     """
-    Insere um novo teste na tabela 'testes' e retorna o teste_id gerado.
+    Insere um novo teste na tabela 'testes' e retorna o id gerado.
     """
     if not BD_DISPONIVEL:
         return None
@@ -174,7 +172,7 @@ def inserir_teste_bd(conn: Any, resultados: dict) -> Optional[int]:
                     tipo_ficheiro, nome_ficheiro, tamanho_original,
                     algoritmo, versao_script, origem, data_execucao, comentario_previo
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                RETURNING teste_id
+                RETURNING id
             """)
             
             ext = os.path.splitext(resultados["ficheiro"])[1].lower()
@@ -193,9 +191,9 @@ def inserir_teste_bd(conn: Any, resultados: dict) -> Optional[int]:
                 resultados["comentario_previo"]
             ))
             
-            teste_id = cur.fetchone()[0]
+            id_teste = cur.fetchone()[0]
             conn.commit()
-            return teste_id
+            return id_teste
             
     except Exception as e:
         print(f"ERRO ao inserir teste: {e}")
@@ -203,7 +201,7 @@ def inserir_teste_bd(conn: Any, resultados: dict) -> Optional[int]:
         return None
 
 
-def inserir_metricas_bd(conn: Any, teste_id: int, resultados: dict) -> bool:
+def inserir_metricas_bd(conn: Any, id_teste: int, resultados: dict) -> bool:
     """
     Insere as métricas técnicas na tabela 'metricas_tecnicas'.
     """
@@ -214,14 +212,14 @@ def inserir_metricas_bd(conn: Any, teste_id: int, resultados: dict) -> bool:
         with conn.cursor() as cur:
             query = psycopg2.sql.SQL("""
                 INSERT INTO metricas_tecnicas (
-                    teste_id, tamanho_final, taxa_compressao, tempo_execucao,
+                    id_teste, tamanho_final, taxa_compressao, tempo_execucao,
                     entropia_inicial, entropia_final, perdas_detectadas,
                     nivel_ruido, redundancia_detectada, cpu_utilizacao, memoria_utilizada
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """)
             
             cur.execute(query, (
-                teste_id,
+                id_teste,
                 resultados["tamanho_final"],
                 resultados["taxa_compressao"],
                 resultados["tempo_execucao_ms"],
@@ -257,17 +255,17 @@ def gravar_resultados_bd(resultados: dict) -> bool:
     if not conn:
         return False
     
-    teste_id = inserir_teste_bd(conn, resultados)
-    if not teste_id:
+    id_teste = inserir_teste_bd(conn, resultados)
+    if not id_teste:
         conn.close()
         return False
     
-    if not inserir_metricas_bd(conn, teste_id, resultados):
+    if not inserir_metricas_bd(conn, id_teste, resultados):
         conn.close()
         return False
     
     conn.close()
-    print(f"Dados gravados com sucesso (teste_id: {teste_id})\n")
+    print(f"Dados gravados com sucesso (id_teste: {id_teste})\n")
     return True
 
 
