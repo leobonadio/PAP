@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Testes{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Testes Realizados</h2>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">Total de Testes</span>
+            <span class="stat-value">{{ estatisticas.total_testes or 0 }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Algoritmos</span>
+            <span class="stat-value">{{ estatisticas.total_algoritmos or 0 }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Taxa Média</span>
+            <span class="stat-value">{{ estatisticas.media_taxa_compressao | format_number(3) if estatisticas.media_taxa_compressao else 'N/A' }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Tempo Médio</span>
+            <span class="stat-value">{{ estatisticas.media_tempo_execucao | format_number(2) if estatisticas.media_tempo_execucao else 'N/A' }} ms</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters-section">
+    <h3>Filtros</h3>
+    <div class="filters-grid">
+        <div class="filter-group">
+            <label for="filter-algoritmo">Algoritmo:</label>
+            <select id="filter-algoritmo">
+                <option value="">Todos</option>
+                {% for alg in algoritmos %}
+                <option value="{{ alg }}">{{ alg }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filter-tipo">Tipo Ficheiro:</label>
+            <select id="filter-tipo">
+                <option value="">Todos</option>
+                {% for tipo in tipos_ficheiro %}
+                <option value="{{ tipo }}">{{ tipo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filter-origem">Origem:</label>
+            <select id="filter-origem">
+                <option value="">Todas</option>
+                {% for origem in origens %}
+                <option value="{{ origem }}">{{ origem }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <button id="btn-aplicar-filtros" class="btn btn-primary">Aplicar Filtros</button>
+            <button id="btn-limpar-filtros" class="btn btn-secondary">Limpar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Tabela de Testes -->
+<div class="table-section">
+    <table class="data-table" id="tabela-testes">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="select-all"></th>
+                <th>ID</th>
+                <th>Data</th>
+                <th>Algoritmo</th>
+                <th>Ficheiro</th>
+                <th>Taxa Compressão</th>
+                <th>Tempo (ms)</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for teste in testes %}
+            <tr data-id="{{ teste.id }}">
+                <td><input type="checkbox" class="select-teste" value="{{ teste.id }}"></td>
+                <td>{{ teste.id }}</td>
+                <td>{{ teste.data_execucao | format_datetime }}</td>
+                <td><span class="badge">{{ teste.algoritmo }}</span></td>
+                <td>{{ teste.nome_ficheiro }}</td>
+                <td>{{ teste.taxa_compressao | format_number(4) }}</td>
+                <td>{{ teste.tempo_execucao | format_number(2) }}</td>
+                <td class="actions">
+                    <a href="{{ url_for('reflexao', id_teste=teste.id) }}" class="btn-action" title="Reflexão">📝</a>
+                    <button class="btn-action btn-eliminar" data-id="{{ teste.id }}" title="Eliminar">🗑️</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if not testes %}
+<div class="empty-state">
+    <p>Nenhum teste encontrado na base de dados.</p>
+    <p>Execute os scripts de teste para começar a analisar resultados.</p>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Seleção múltipla
+document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.select-teste');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+// Botão comparar
+document.getElementById('btn-comparar').addEventListener('click', function(e) {
+    e.preventDefault();
+    const selecionados = Array.from(document.querySelectorAll('.select-teste:checked'))
+        .map(cb => cb.value);
+    
+    if (selecionados.length === 0) {
+        alert('Selecione pelo menos 1 teste para comparar');
+        return;
+    }
+    
+    if (selecionados.length > 4) {
+        alert('Pode comparar no máximo 4 testes');
+        return;
+    }
+    
+    const params = new URLSearchParams();
+    selecionados.forEach(id => params.append('ids', id));
+    
+    window.location.href = `/comparacao?${params.toString()}`;
+});
+
+// Eliminar teste
+document.querySelectorAll('.btn-eliminar').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const id = this.dataset.id;
+        
+        if (!confirm('Tem a certeza que deseja eliminar este teste? Esta ação não pode ser revertida.')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/eliminar/${id}`, {
+                method: 'DELETE'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Remove linha da tabela
+                this.closest('tr').remove();
+                alert('Teste eliminado com sucesso');
+            } else {
+                alert('Erro ao eliminar teste: ' + data.message);
+            }
+        } catch (error) {
+            alert('Erro ao comunicar com o servidor');
+        }
+    });
+});
+
+// Filtros
+document.getElementById('btn-aplicar-filtros').addEventListener('click', async function() {
+    const algoritmo = document.getElementById('filter-algoritmo').value;
+    const tipo = document.getElementById('filter-tipo').value;
+    const origem = document.getElementById('filter-origem').value;
+    
+    try {
+        const response = await fetch('/api/filtrar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                algoritmo: algoritmo || null,
+                tipo_ficheiro: tipo || null,
+                origem: origem || null
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Atualiza tabela (simplificado - recarrega página)
+            window.location.reload();
+        }
+    } catch (error) {
+        alert('Erro ao aplicar filtros');
+    }
+});
+
+document.getElementById('btn-limpar-filtros').addEventListener('click', function() {
+    document.getElementById('filter-algoritmo').value = '';
+    document.getElementById('filter-tipo').value = '';
+    document.getElementById('filter-origem').value = '';
+    window.location.href = '/';
+});
+</script>
+{% endblock %}

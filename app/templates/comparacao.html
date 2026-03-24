@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Comparação de Testes{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Comparação de Testes</h2>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">← Voltar</a>
+</div>
+
+{% if testes|length == 0 %}
+<div class="empty-state">
+    <p>Nenhum teste selecionado para comparação.</p>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Selecionar Testes</a>
+</div>
+{% else %}
+
+<div class="comparison-grid">
+    {% for teste in testes %}
+    <div class="comparison-card">
+        <div class="card-header">
+            <h3>Teste #{{ teste.id }}</h3>
+            <span class="badge">{{ teste.algoritmo }}</span>
+        </div>
+        
+        <div class="card-body">
+            <div class="info-section">
+                <h4>Informações</h4>
+                <p><strong>Ficheiro:</strong> {{ teste.nome_ficheiro }}</p>
+                <p><strong>Data:</strong> {{ teste.data_execucao | format_datetime }}</p>
+                <p><strong>Origem:</strong> {{ teste.origem }}</p>
+            </div>
+            
+            <div class="metrics-section">
+                <h4>Compressão</h4>
+                <div class="metric-row">
+                    <span class="metric-label">Original:</span>
+                    <span class="metric-value">{{ teste.tamanho_original | format_bytes }}</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Comprimido:</span>
+                    <span class="metric-value">{{ teste.tamanho_final | format_bytes }}</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Taxa:</span>
+                    <span class="metric-value">{{ teste.taxa_compressao | format_number(4) }}</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Ganho:</span>
+                    <span class="metric-value">{{ ((1 - teste.taxa_compressao) * 100) | format_number(2) }}%</span>
+                </div>
+            </div>
+            
+            <div class="metrics-section">
+                <h4>Entropia</h4>
+                <div class="metric-row">
+                    <span class="metric-label">Inicial:</span>
+                    <span class="metric-value">{{ teste.entropia_inicial | format_number(4) }} bits/byte</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Final:</span>
+                    <span class="metric-value">{{ teste.entropia_final | format_number(4) }} bits/byte</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Variação:</span>
+                    <span class="metric-value">
+                        {{ (teste.entropia_final - teste.entropia_inicial) | format_number(4) }}
+                        ({{ (((teste.entropia_final - teste.entropia_inicial) / teste.entropia_inicial) * 100) | format_number(2) }}%)
+                    </span>
+                </div>
+            </div>
+            
+            <div class="metrics-section">
+                <h4>Redundância</h4>
+                <div class="metric-row">
+                    <span class="metric-label">Inicial:</span>
+                    <span class="metric-value">{{ teste.redundancia_detectada | format_number(4) }}</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Final:</span>
+                    <span class="metric-value">
+                        {{ (1 - (teste.entropia_final / 8.0)) | format_number(4) }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="metrics-section">
+                <h4>Desempenho</h4>
+                <div class="metric-row">
+                    <span class="metric-label">Tempo:</span>
+                    <span class="metric-value">{{ teste.tempo_execucao | format_number(2) }} ms</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">CPU:</span>
+                    <span class="metric-value">{{ teste.cpu_utilizacao | format_number(2) }}%</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Memória:</span>
+                    <span class="metric-value">{{ teste.memoria_utilizada | format_bytes }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-footer">
+            <a href="{{ url_for('reflexao', id_teste=teste.id) }}" class="btn btn-small btn-primary">Ver Reflexão</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endif %}
+
+{% endblock %}

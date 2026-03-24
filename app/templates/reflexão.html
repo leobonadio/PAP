@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Reflexão - Teste #{{ teste.id }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Reflexão Crítica - Teste #{{ teste.id }}</h2>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">← Voltar</a>
+</div>
+
+<div class="reflexao-container">
+    <!-- Informações do Teste (Read-only) -->
+    <div class="teste-info-card">
+        <h3>Informações do Teste</h3>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Algoritmo:</span>
+                <span class="info-value"><span class="badge">{{ teste.algoritmo }}</span></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Ficheiro:</span>
+                <span class="info-value">{{ teste.nome_ficheiro }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Data:</span>
+                <span class="info-value">{{ teste.data_execucao | format_datetime }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Taxa Compressão:</span>
+                <span class="info-value">{{ teste.taxa_compressao | format_number(4) }}</span>
+            </div>
+        </div>
+        
+        <div class="comentario-previo">
+            <strong>Comentário Prévio:</strong>
+            <p>{{ teste.comentario_previo or 'Nenhum comentário' }}</p>
+        </div>
+    </div>
+    
+    <!-- Formulário de Reflexão (Editável) -->
+    <div class="reflexao-form-card">
+        <h3>{% if reflexao %}Editar{% else %}Criar{% endif %} Reflexão</h3>
+        
+        <form method="POST" class="reflexao-form">
+            <div class="form-group">
+                <label for="anotacao">Anotação Geral *</label>
+                <textarea 
+                    id="anotacao" 
+                    name="anotacao" 
+                    rows="6" 
+                    required
+                    placeholder="Observações gerais sobre o teste, comportamento observado, resultados inesperados..."
+                >{{ reflexao.anotacao if reflexao else '' }}</textarea>
+                <span class="form-hint">Descrição geral da observação</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="interpretacao_epistemica">Interpretação Epistemotécnica</label>
+                <textarea 
+                    id="interpretacao_epistemica" 
+                    name="interpretacao_epistemica" 
+                    rows="8"
+                    placeholder="Relacione os resultados com conceitos teóricos: decisão algorítmica, perda informacional, filtragem, reorganização simbólica, ruído como elemento produtivo..."
+                >{{ reflexao.interpretacao_epistemica if reflexao else '' }}</textarea>
+                <span class="form-hint">Relação entre os efeitos observados e os conceitos epistemológicos do projeto</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="contexto_execucao">Contexto de Execução</label>
+                <textarea 
+                    id="contexto_execucao" 
+                    name="contexto_execucao" 
+                    rows="4"
+                    placeholder="Condições práticas do teste: interferências, imprevistos, particularidades da máquina, sistema operativo, rede..."
+                >{{ reflexao.contexto_execucao if reflexao else '' }}</textarea>
+                <span class="form-hint">Condições técnicas e ambientais que possam ter influenciado o resultado</span>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-large">
+                    {% if reflexao %}Atualizar Reflexão{% else %}Guardar Reflexão{% endif %}
+                </button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Métricas Rápidas (para consulta enquanto escreve) -->
+    <div class="metricas-quick-view">
+        <h4>Métricas (Referência)</h4>
+        
+        <div class="quick-metric">
+            <span>Compressão:</span>
+            <strong>{{ teste.tamanho_original | format_bytes }} → {{ teste.tamanho_final | format_bytes }}</strong>
+        </div>
+        
+        <div class="quick-metric">
+            <span>Ganho:</span>
+            <strong>{{ ((1 - teste.taxa_compressao) * 100) | format_number(2) }}%</strong>
+        </div>
+        
+        <div class="quick-metric">
+            <span>Entropia:</span>
+            <strong>{{ teste.entropia_inicial | format_number(4) }} → {{ teste.entropia_final | format_number(4) }}</strong>
+        </div>
+        
+        <div class="quick-metric">
+            <span>Redundância Inicial:</span>
+            <strong>{{ teste.redundancia_detectada | format_number(4) }}</strong>
+        </div>
+        
+        <div class="quick-metric">
+            <span>Tempo:</span>
+            <strong>{{ teste.tempo_execucao | format_number(2) }} ms</strong>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
