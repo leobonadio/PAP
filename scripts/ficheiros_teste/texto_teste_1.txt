@@ -1,0 +1,44 @@
+Desde há muito tempo que se reconhece o ruído como um fator de risco ocupacional e muito se
+tem investigado sobre a sua influência na saúde e na segurança. Além dos efeitos fisiológicos já
+conhecidos, o ruído tem um impacto significativo no comportamento (nervosismo, irritabilidade,
+ansiedade, agressividade, intolerância), no desempenho do trabalho (falta de atenção, perda de
+eficácia e fadiga), na comunicação, no descanso e no lazer. No entanto, estas alterações não
+dependem apenas do nível de pressão sonora, mas também do tipo de ruído e de características
+individuais dos indivíduos.
+Com este estudo piloto pretendeu-se avaliar a influência do ruído no desempenho cognitivo,
+considerando o sexo e a sensibilidade individual ao ruído. Submeteram-se os voluntários (N=38)
+a 3 ensaios de cerca de 10 minutos, onde realizaram a tarefa cognitiva (Teste Go-NoGo da
+bateria de testes PEBL) sujeitos a 3 condições diferentes de ruído branco: 60 dB(A), 75 dB(A) e
+85 dB(A), registadas pelo sonómetro. Os ensaios decorreram em dias diferentes (mínimo de
+24h00 de diferença) no interior da câmara climática (não anecoica) a fim de se conseguir
+controlar outros agentes que possam interferir no desempenho cognitivo. Aplicou-se ainda um
+questionário de sensação térmica que permite averiguar o modo subjetivo como os voluntários
+percecionam o ambiente térmico no interior da câmara climática, e o questionário de
+sensibilidade individual ao ruído (WNS) que permitiu distinguir quais os voluntários sensíveis ao
+ruído (SR) e não sensíveis ao ruído (NSR).
+Relativamente à sensibilidade ao ruído em geral, é maior a percentagem de voluntários do sexo
+feminino (SF) que se consideram SR, enquanto a maior percentagem de voluntários do sexo
+masculino (SM) considera-se NSR.
+Da análise à percentagem média de erros efetuados na tarefa Go-NoGo verifica-se que a
+exposição a 75 dB(A) foi a condição que de uma forma geral melhorou o desempenho cognitivo
+dos voluntários. A pior condição não é inequivocamente a 85 dB(A), visto que a 60 dB(A)
+também se verificou uma percentagem de erros elevados no entanto, estas diferenças não são
+estatisticamente significativas (p>0,05) à exceção da percentagem média de erros “P” na ronda 1
+(Go) onde se verifica que a exposição a 60 dB(A) é significativamente diferente da exposição a
+85 dB(A). Comparativamente, os SR cometem mais erros que os NSR, no entanto estas
+diferenças apenas são estatisticamente significativas (p<0,05) no que respeita aos erros “P” na
+ronda 2 (NoGo) a 85 dB(A), podendo-se concluir que níveis mais elevados de ruído afetam
+negativamente indivíduos SR tornando-os mais impulsivos.
+Entre sexos verifica-se que na generalidade o SM comete mais erros que o SF, verificando-se
+que o SM comete especificamente mais erros de impulsividade (NoGo) que o SF, verificando-se
+diferenças estatisticamente significativas (p<0,05) na ronda 2 a 75 dB(A) e a 85 dB(A).
+Relativamente ao tempo de reação verifica-se que o nível mais elevado de ruído diminui
+significativamente (p<0,05) o tempo de reação a estímulos “Go” na ronda 1 e na ronda 2.
+Comparativamente entre NSR e SR verifica-se que estes úlimos demoram mais tempo a reagir a
+estímulos “NoGo”, enquanto os NSR demoram mais tempo a reagir a estímulos “Go”. Entre
+sexos, o SM demora mais tempo a reagir a estímulos “NoGo” enquanto que o SF demora mais
+tempo a reagir a estímulos “Go”.
+A condição onde simultaneamente se verifica uma diminuição do tempo de reação e dos erros
+cometidos que uma forma geral é a condição a 75 dB(A), concluindo-se que uma exposição a
+ruído branco de 75 dB(A), durante cerca de 10 minutos, aumenta o desempenho dos indivíduos
+na realização de uma tarefa Go-NoGo, de reação a estímulos.
